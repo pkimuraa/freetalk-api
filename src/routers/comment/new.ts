@@ -33,4 +33,4 @@ router.post(
   }
 );
 
-export { router as newPostRouter };
+export { router as newCommentRouter };

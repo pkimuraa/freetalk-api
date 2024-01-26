@@ -1,6 +1,14 @@
 import * as dotenv from "dotenv";
 dotenv.config();
 
+import {
+  newPostRouter,
+  deletePostRouter,
+  updatePostRouter,
+  showPostRouter,
+  newCommentRouter,
+  deleteCommentRouter,
+} from "./routers";
 import express, { Request, Response, NextFunction } from "express";
 import mongoose from "mongoose";
 
@@ -14,6 +22,21 @@ declare global {
     status?: number;
   }
 }
+
+
+app.use(newPostRouter);
+app.use(deletePostRouter)
+app.use(updatePostRouter);
+app.use(showPostRouter);
+
+app.use(newCommentRouter);
+app.use(deleteCommentRouter);
+
+app.all('*', (req: Request, res: Response, next: NextFunction) => {
+  const error = new Error('not Found') as CustomError;
+  error.status = 404;
+  next(error);
+})
 
 app.use(
   (error: CustomError, req: Request, res: Response, next: NextFunction) => {
