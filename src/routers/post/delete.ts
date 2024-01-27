@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, Router } from "express";
-import Post from "src/models/post";
+import Post from "../../models/post";
 const router = Router();
 
 router.delete(
@@ -19,7 +19,7 @@ router.delete(
       next(new Error("post cannot be updated"));
     }
 
-    res.status(200).json({success: true})
+    res.status(200).json({ success: true });
   }
 );
 

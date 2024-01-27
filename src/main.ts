@@ -1,6 +1,5 @@
 import * as dotenv from "dotenv";
 dotenv.config();
-
 import {
   newPostRouter,
   deletePostRouter,
@@ -9,13 +8,48 @@ import {
   newCommentRouter,
   deleteCommentRouter,
 } from "./routers";
-import express, { Request, Response, NextFunction } from "express";
+import express, {
+  Request,
+  Response,
+  NextFunction,
+  urlencoded,
+  json,
+} from "express";
 import mongoose from "mongoose";
+import cors from "cors";
+
+const start = async () => {
+
+  if (!process.env.MONGO_URI) throw new Error("MONGO_URI UNDEFINED");
+
+  try {
+    mongoose.connect(process.env.MONGO_URI);
+
+  } catch (err) {
+    throw new Error("databse error");
+  }
+};
 
 const app = express();
+start()
 
-express.urlencoded({ extended: false });
-express.json();
+app.use(
+  cors({
+    origin: "*",
+    optionsSuccessStatus: 200,
+  })
+);
+
+app.use(urlencoded({ extended: false }));
+app.use(json());
+
+app.use(newPostRouter);
+app.use(deletePostRouter);
+app.use(updatePostRouter);
+app.use(showPostRouter);
+
+app.use(newCommentRouter);
+app.use(deleteCommentRouter);
 
 declare global {
   interface CustomError extends Error {
@@ -23,20 +57,11 @@ declare global {
   }
 }
 
-
-app.use(newPostRouter);
-app.use(deletePostRouter)
-app.use(updatePostRouter);
-app.use(showPostRouter);
-
-app.use(newCommentRouter);
-app.use(deleteCommentRouter);
-
-app.all('*', (req: Request, res: Response, next: NextFunction) => {
-  const error = new Error('not Found') as CustomError;
+app.all("*", (req: Request, res: Response, next: NextFunction) => {
+  const error = new Error("not Found") as CustomError;
   error.status = 404;
   next(error);
-})
+});
 
 app.use(
   (error: CustomError, req: Request, res: Response, next: NextFunction) => {
@@ -48,14 +73,6 @@ app.use(
   }
 );
 
-const start = async () => {
-  if (!process.env.MONGO_URI) throw new Error("MONGO_URI UNDEFINED");
 
-  try {
-    mongoose.connect(process.env.MONGO_URI);
-  } catch (err) {
-    throw new Error("databse error");
-  }
-};
 
 app.listen(8080, () => console.log("up and running on 8080"));
